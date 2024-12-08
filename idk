@@ -1,0 +1,168 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+      }
+
+      #background {
+        position: absolute;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        background: radial-gradient(circle, rgb(0, 0, 0), rgb(1, 44, 42));
+      }
+
+      .star {
+        position: absolute;
+        background: rgb(57, 255, 215);
+        border-radius: 50%;
+        transform: scale(0);
+        animation: sparkle 2s infinite, drift linear infinite;
+      }
+
+      @keyframes sparkle {
+        0%, 100% {
+          opacity: 0;
+          transform: scale(0);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      @keyframes drift {
+        0%, 100% {
+          transform: translate(0, 0);
+        }
+        50% {
+          transform: translate(50px, -50px);
+        }
+      }
+
+      /* Centered Menu Styles */
+      .menu {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 300px;
+        background-color: rgba(0, 255, 255, 0.2);
+        padding: 10px 20px;
+        border-radius: 25px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .search-bar {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        border: none;
+        border-radius: 20px;
+        outline: none;
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+
+      .search-bar::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .close-button {
+        font-size: 20px;
+        cursor: pointer;
+        color: #333;
+        background: none;
+        border: none;
+        padding: 0;
+      }
+
+      .close-button:hover {
+        color: red;
+      }
+
+      .search-button {
+        background-color: #333;
+        color: white;
+        padding: 10px;
+        border-radius: 20px;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      .search-button:hover {
+        background-color: #555;
+      }
+
+    </style>
+</head>
+
+<body>
+    <div id="background">
+        <!-- Generating stars -->
+        <script>
+            const numStars = 300;
+            const background = document.getElementById('background');
+
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.style.width = `${Math.random() * 3}px`;
+                star.style.height = star.style.width;
+                star.style.left = `${Math.random() * 100}vw`;
+                star.style.top = `${Math.random() * 100}vh`;
+
+                background.appendChild(star);
+            }
+        </script>
+    </div>
+
+    <div class="menu">
+        <!-- Search Bar and Close Button -->
+        <input type="text" class="search-bar" id="search-input" placeholder="Enter URL...">
+        <button class="search-button" onclick="launchByeBlocker()">Launch ByeBlocker</button>
+        <button class="close-button" onclick="closeMenu()">×</button>
+    </div>
+
+    <script>
+        function launchByeBlocker() {
+            var link = document.getElementById('search-input').value;
+            if (!link) {
+                alert("Please enter a URL");
+                return;
+            }
+            var proxy = 'https://api.codetabs.com/v1/proxy?quest=';
+            fetch(proxy + link)
+                .then((response) => response.text())
+                .then((text) => document.write(text));
+            var all = document.getElementsByTagName("*");
+            for (var i = 0, max = all.length; i < max; i++) {
+                if (all[i].src) {
+                    all[i].src = new URL(all[i].src, link).href;
+                    all[i].src = proxy + all[i].src;
+                }
+            }
+            window.onbeforeunload = function (e) {
+                e.preventDefault();
+                alert(e.toString());
+            };
+            function locationHashChanged(e) {
+                e.preventDefault();
+                alert(e);
+                window.location = new URL(e.oldURL, e.newURL).href;
+            }
+            window.onhashchange = locationHashChanged;
+        }
+
+        function closeMenu() {
+            document.querySelector('.menu').style.display = 'none';
+        }
+    </script>
+</body>
